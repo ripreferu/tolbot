@@ -4,3 +4,6 @@ if test=="iresam":
     line 
     Comment'''
     print("go fuck yourself")
+def whatistest():
+"""donne le contenu de la variable test """
+	return test
