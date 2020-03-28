@@ -19,10 +19,10 @@ Created on Thu Oct 31 16:00:13 2019
 '''
 #%%
 ''' Importation des bibliothèques nécessaires '''
-
+import class_xml as extracted_data
 from nltk.corpus import stopwords
 import stanfordnlp
-import dictionnaire_synV7 as dico #importation du dictionnaire des synonymes
+#import dictionnaire_synV7 as dico #importation du dictionnaire des synonymes
 import random #permet de choisir une réponse au hasard dans une liste de possibilité 
 # IDF = Inverse Document Frequency : permet de représenter les mots en vecteurs
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -32,7 +32,7 @@ from numpy import where
 from itertools import product
 """ Paramétrage de la bibliothèque stanfordnlp"""
 # etape à suivre
-# standfordnlp.download('fr')
+#stanfordnlp.download('fr')
 
 nlp=stanfordnlp.Pipeline(processors="tokenize,pos,lemma",lang='fr')
 #%%
@@ -47,16 +47,16 @@ def tokenisation_phrase(texte):
             resultat+=" "
         liste_resultats.append(resultat)
     return liste_resultats
-#def tokenisation_mot(texte):
-#    liste_resultats=[]
-#    phrase_a_tokeniser=nlp(texte)
-#    for phrase in phrase_a_tokeniser.sentences:
-#        #resultat=""
-#        for mot in phrase.words:
-#            #resultat+=mot.text
-#            #resultat+=" "
-#            liste_resultats.append(mot.text)
-#    return liste_resultats
+def tokenisation_mot(texte):
+   liste_resultats=[]
+   phrase_a_tokeniser=nlp(texte)
+   for phrase in phrase_a_tokeniser.sentences:
+       #resultat=""
+       for mot in phrase.words:
+           #resultat+=mot.text
+           #resultat+=" "
+           liste_resultats.append(mot.text)
+   return liste_resultats
 #    
 """ Suppression des StopWords """
 stop_words = set(stopwords.words('french'))
@@ -78,12 +78,28 @@ def traitement(texte):
 #%%
 """ Lecture de données d'un corpus """
 
-texte = open('fichier_sans_extentions.txt','r')
+def traitement_section(texte_sections,texte_traite_hier=[]):
+    """Fonction_recursive avec la liste texte_sections 
+    texte_traite_hier étant une liste
+    
+    """
+    for sous_sections in texte_sections:
+        if isinstance(sous_sections,str):
+            #print(sous_sections)
+            texte_traite_hier+=[traitement(sous_sections)]
+        elif isinstance(sous_sections,list):
+            texte_traite_hier+=[traitement_section(sous_sections,texte_traite_hier)]
+    return texte_traite_hier
 
-corpus=texte.read()
-corpus_traite=traitement(corpus)
-token_phr = tokenisation_phrase(corpus)
-texte.close()
+
+
+#texte = open('fichier_sans_extentions.txt','r',encoding="utf8")
+texte= extracted_data.test.Texte
+#corpus_traite=traitement_section(texte)
+#corpus=texte.read()
+# corpus_traite=traitement(corpus)
+# token_phr = tokenisation_phrase(corpus)
+# texte.close()
 
 #%%
 """ Analyse lexico-syntaxique """ 
@@ -475,7 +491,7 @@ def repartition(table_QR):
     chaine de caractère de type string.
     Elle retourne 2 listes de questions et réponses : QU et REP.
     '''
-    fichier = open("{}.txt".format(table_QR),"r")
+    fichier = open("{}.txt".format(table_QR),"r",encoding="iso-8859-1")
     table = fichier.read()
     fichier.close()
     
@@ -637,3 +653,16 @@ dic_syns = synonyme_liste(liste_noms)
 QU, REP = repartition('table_QR')
 QU_texte = ' '.join(QU)
 traitement_QU = traitement(QU_texte.lower())
+#Vectorizer=TfidfVectorizer(tokenizer=tokenisation_mot,norm=None,use_idf=False,smooth_idf=False)
+#test=Vectorizer.fit_transform(corpus_traite)
+liste_hier=extracted_data.test.Texte
+def flatten(x):
+    resultat=""
+    for item in x:
+        if type(item)==list:
+            resultat+=flatten(item)
+        else:
+            resultat+=item
+    return resultat
+doc=[flatten(i) for i in liste_hier]
+sections_traité=[traitement(i) for i in doc]
