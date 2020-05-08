@@ -1,17 +1,6 @@
-# from bs4 import BeautifulSoup
-# with open("/home/pierre/Téléchargements/Corpus_BA/1_spécif ISO_Bases juin 2017 v5 ANSELMETTI/document_1.html") as fp:
-#     soup = BeautifulSoup(fp,"html.parser")
-#     # print(soup.prettify())
-# ####
-# structure=soup.body.find_all(["h1","h2","h3"])
-# structure_arbre=[]
-# for headings in structure:
-#     #print(headings.name)
-#     if headings.name=='h1':
-#         if element_arbre!=None:
-#             structure_arbre.append(element_arbre)          
-#         element_arbre= headings
-#     elif headings.name
+import pathlib as pl
+import treelib as tl
+import random
 import pandas as pd
 import numpy as np
 import xml.etree.ElementTree as ET
@@ -19,6 +8,8 @@ import xml.etree.ElementTree as ET
 tree=ET.parse("/home/pierre/Documents/CorpusV2/Corpus_augmente/Docx/2_Spécif ISO_Complément 2017 v4ANSELMETTI/2_Spécif ISO_Complément 2017 v4ANSELMETTI.xml")
 root=tree.getroot()
 doc=root[1][0]
+ET.register_namespace("",'{http:\\www.tei-c.org/ns/1.0}')
+ns='{http://www.tei-c.org/ns/1.0}'
 # for child in document.iter():
 #     print(child.tag)
 ###
@@ -104,7 +95,15 @@ def creer_array(liste):
         liste_de_travail=np.array(transformation(longueur_souhait,liste_de_travail))
         print(liste_de_travail)
         print(indice)
-        
+def flatten(x):
+    resultat=""
+    for item in x:
+        if type(item)==list:
+            resultat+=flatten(item)
+        else:
+            resultat+=item
+    return resultat
+
 class document():
     """
     self.tree est l'arbre XML
@@ -117,9 +116,11 @@ class document():
     self.Texte est le texte contenu dans ces sections
     """
     def __init__(self,chemin):
-        self.chemin=chemin
+        self.id=random.random()
+        self.chemin=pl.Path(chemin)
         self.tree=ET.parse(chemin)
         self.racine_doc= self.tree.getroot()
+        ET.register_namespace("xml",'http://www.tei-c.org/ns/1.0')
         self.dico=self.racine_doc.tag[:-3]
         # en supposant que le fichier a bien été formater sous la format XML TEI
         self.document = self.racine_doc[1][0]
@@ -127,16 +128,20 @@ class document():
         #### informations relatives à l'oeuvre self.metadata [0]
         #### informations relatives à la publication self.metadata[1]
         ### informations relatives à la source
+        self.treelib=tl.Tree()
         self.Titre=None
         for children in self.metadata.iter():
-            if children.tag[-5]=="title":
+            if children.tag[-5:]=="title":
                 self.Titre=children.text
-            elif children.tag[-5:]=="author":
+            elif children.tag[-6:]=="author":
                 self.Auteur=children.text
+        
         self.sections=[]
         self.definir_les_sections()
         self.Texte=[]
-        self.texte_documents()
+        #self.texte_documents()
+        self.treelib.create_node("Document ",self.id, data=self)
+        self.creation_arbre()
         # dim=dimension(self.Texte) 
         # profondeur=len(dim)
         
@@ -144,6 +149,36 @@ class document():
         # self.D={"chemin":self.chemin, "titre":self.Titre ,}
         # liste_test= [*self.sections, [rv[i][:] for i in range(len(rv))]]
         # self.data=pd.DataFrame(data=self.D)
+            
+    def ajout_section_arbre(self,section_add):
+        assert isinstance(section_add,section) or isinstance(section_add,liste) or isinstance(section_add,paragraph)
+        
+        for children in section_add.Contenu:
+            if isinstance(children,section):
+                self.treelib.create_node(tag=str(children), identifier=children.id, parent=section_add.id, data=children)
+                self.ajout_section_arbre(children)
+            elif isinstance(children,liste):
+                self.treelib.create_node(tag=str(children),identifier=children.id,parent=section_add.id, data=children)
+                self.ajout_section_arbre(children)
+            elif isinstance(children,paragraph):
+                if children.texte!=' None ':
+                    self.treelib.create_node(tag=str(children),identifier=children.id,parent=section_add.id,data=children)
+                if len(children.Contenu)>0:
+                    for item in children.Contenu:
+                        if isinstance(item,figure) or isinstance(item,image):
+                            item.url=self.chemin.parents[0].joinpath(item.url)
+                            self.treelib.create_node(tag=str(item),identifier=item.id,parent=section_add.id,data=item)
+                            #data=self.chemin.parents[0]+children.url)
+                        if isinstance(item,note):
+                            self.treelib.create_node(tag=str(item),identifier=item.id,parent=section_add.id,data=item)
+            else:
+                self.treelib.create_node(tag=str(children),identifier=children.id,parent=section_add.id, data=children)
+    def creation_arbre(self):
+        for section in self.sections:
+            self.treelib.create_node(tag=str(section),identifier=section.id,parent=self.id,data=section)
+            # for contenu in section.Contenu:
+            #     self.treelib.create_node(tag=str(contenu),identifier=contenu.id,parent=section.Titre,data=contenu.texte)
+            self.ajout_section_arbre(section)
 
     def definir_les_sections(self):
         Liste=[]
@@ -154,14 +189,39 @@ class document():
             item=section(i)
             self.sections.append(item)
     def texte_documents(self):
-        for section in self.sections:
-            self.Texte.append(section.texte)
+        Tree=self.treelib
+        node_sec_l=Tree.children(Tree.root) #liste de noeuds
+        liste_texte=[]
+        for node_sec in node_sec_l:
+            ensemble_sous_section=[Tree.get_node(ide)
+                                       for ide in Tree.expand_tree(node_sec.data.id,filter=lambda x: \
+                                                                   x.tag not in ["liste","paragraphe","image","note"])]
+            liste_titre=[node.data.Titre for node in ensemble_sous_section]
+            liste_inter=[flatten(node.data.texte) for node in Tree.leaves(node_sec.data.id) if node.tag!="image"]
+            ajout_texte=" ".join(liste_inter)
+            if len(liste_titre)>0:
+                ajout_titre=" ".join(liste_titre[:])
+                ajout_texte+=ajout_titre
+            liste_texte.append(ajout_texte[:])
+        return liste_texte
+    def Forme_travail_texte(self):
+        """ renvoie la liste utile pour la suite du traitement nlp
+        sous la forme d'une liste de couple:
+        '(Titre, "Doc")'
+        '(Nom de la section,"Section")'
+        '(Contenu autre, "Autre")'
+        """
+        pass
+
 class liste():
     def __init__(self,element_xml):
+        self.id=random.random()
         self.Contenu=[]
         self.texte=""
         self.pt_mnt_xml=element_xml
         self.definir_Contenu()
+    def __repr__(self):
+        return "liste"
     def definir_Contenu(self):
         Sous_contenu_xml=[]
         for itemxml in self.pt_mnt_xml:
@@ -175,7 +235,7 @@ class liste():
                 self.Contenu.append(nouv_section)
                 self.texte+=nouv_section.texte_sect()
             elif itemxml.tag[-6:]=="figure":
-                self.Contenu.append(figure(itemxml)) #à coder
+                self.Contenu.append(image(itemxml)) #à coder
             elif itemxml.tag[-1:]=="p":
                 nouv_para=paragraph(itemxml)
                 self.Contenu.append(nouv_para)
@@ -210,8 +270,9 @@ class section():
                 #print(souscontenu[:])
                 self.Contenu.append(paragraph(souscontenu[0]))
         self.texte_sect()
+        self.id=random.random()
     def __repr__(self):
-        return "section "+str(self.Nom)
+        return str(self.Nom)
     def __getitem__(self,index):
         if index==slice:
             return self.Contenu[index.start,index.stop]
@@ -245,6 +306,7 @@ class paragraph():
         #assert element.tag[-3:]!='head'
         # paragraph doit être instancié à partir des sections
         #print(element[:])
+        self.id=random.random()
         self.Contenu=[]
         self.texte=""
         if type(element.text)==str:
@@ -261,39 +323,77 @@ class paragraph():
                 # if len(children.attrib)!=0:
             #         print(children.attrib)
             #     print(children[0].tag[-3:])
-                self.Contenu.append(figure(children))
+                self.Contenu.append(image(children))
                 if str(children.tail) is not None:
                     self.texte+=" "+str(children.tail).replace("\n","")
-            elif children.tag[-2:]=="lb":
+                #possiblité d'ajouté une image
+            elif children.tag[-4:]=="note":
+                self.Contenu.append(note(children))
+                if str(children.tail) is not None:
+                    self.texte+=" "+str(children.tail).replace("\n","")
+            elif children.tag[-2:]=="lb" and children.tail is not None:
                 self.texte+=" "+str(children.tail).strip()
         self.texte+=" "
-        #print(self.texte)
-                #print(children.tail)
-            #     print(children.tail)
         #self.XML=element
         ######## self.texte=" ".join(element.itertext())
         #self.texte=element.find("p").text
         #self.texte=self.texte.replace('\n',' ')
         #self.texte=self.texte.strip()
-
+    def __repr__(self):
+        return self.texte
 class figure():
     def __init__(self,element):
-        if element.find("graphic"):
-            return image(element)
-        elif element.find("formula"):
-            return equation(element)
+        self.id=random.random()
+        if element.findall(ns+"graphic"):
+            self=image(element)
+        elif element.findall(ns+"formula"):
+            self=equation(element)
+    def __repr__(self):
+        return "figure"
 class image(figure):
     def __init__(self,element):
-        self.url=element[0].attrib["url"]
-class equation(figure):
-    def init(self,element):
-        assert element.tag[-3:]=="figure"
-        assert element.attrib["type"]=="math"
-        formula=element.find("formula")
-        self.notation=formula.attrib["notation"]
-        self.contenu=formula.text
+        self.id=random.random()
+        # print(element[:])
+        nom=ns+'graphic'
+        graphic=element.find(nom)
+        #print(graphic)
+        self.texte=""
+        # print(element[0].attrib)
+        self.url=graphic.attrib["url"]
+        #print('ok')
+        if element.findall(ns+'head'):
+            titre=element.find(ns+'head')
+            #print(titre.text)
+            self.texte=titre.text
+        if element.findall(ns+'figDesc'):
+            figDesc=element.find(ns+'figDesc')
+            #print(figDesc.text)
+    def __repr__(self):
+        if len(self.texte)!=0:
+            return self.texte
+        else:
+            return "image"
+
+# class equation(figure):
+#     def init(self,element):
+#         assert element.tag=="figure"
+#         assert element.attrib["type"]=="math"
+#         formula=element.find("formula")
+#         self.notation=formula.attrib["notation"]
+#         self.contenu=formula.text
+
+class note():
+    def __init__(self,element):
+        self.id=random.random()
+        self.texte=element.text
+        #print(self.texte)
+    def __repr__(self):
+        return "note"
 #test=document("/home/pierre/Documents/CorpusV2/Corpus_augmente/Docx/2_Spécif ISO_Complément 2017 v4ANSELMETTI/2_Spécif ISO_Complément 2017 v4ANSELMETTI.xml")
-test=document("/home/pierre/Documents/CorpusV2/Corpus_augmente/Docx/2_Spécif ISO_Complément 2017 v4ANSELMETTI/essai.xml")
-#test.definir_les_sections()
-#problème=test.document[5][1]
-#titi=liste(test.document[4][1][1][2])
+# test=document("/home/pierre/Documents/CorpusV2/Corpus_augmente/Docx/2_Spécif ISO_Complément 2017 v4ANSELMETTI/essai.xml")
+# #test.definir_les_sections()
+# #problème=test.document[5][1]
+# #titi=liste(test.document[4][1][1][2])
+# tree=test.treelib
+# liste_para=[node.data.texte for node in tree.filter_nodes(lambda x: x.tag == "paragraphe")]
+
