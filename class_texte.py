@@ -1,6 +1,5 @@
 from nltk.corpus import stopwords
 import stanza
-# import class_xml
 import pickle
 import re
 nlp = stanza.Pipeline(processors="tokenize,pos,lemma",
