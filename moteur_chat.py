@@ -6,6 +6,7 @@ from scipy import sparse
 import class_xml
 import class_texte
 from pyemd import emd
+import csv
 # logging.basicConfig(filename="chatbot.log",level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -54,7 +55,7 @@ def protocole_sac_de_mot(matrice, Req, dico_doc, dico_mots):
     # Fin de la création du vecteur_requête au sens sac de mots.
     nbre_doc = len(dico_doc)
     score = []
-    long_req = len(Req)
+    long_req = sum([i**2 for i in vec_Req])
     for ligne in range(nbre_doc):
         vec_doc = matrice[ligne, :]
         logger.debug("dimension de vecteur document:{}".format(vec_doc.shape))
@@ -232,6 +233,31 @@ dans la liste de reponses.
 ######################
 
 
+def annexe4(listes_classement, filep):
+    '''Listes de classement =[class_A1, Class_A2,Class_B,Class_C]
+    filep termine en tsv'''
+    with open(filep, 'wt') as f:
+        tsv_writer = csv.writer(f, delimiter='\t')
+        for i, v in enumerate(["classement_A1", "classement_A2",
+                               "classement_B", "classement_C"]):
+            tsv_writer.writerow([v])
+            for j in range(10):
+                elt, doc = docID2text(listes_classement[i][j][0])
+                tata = doc.Titre
+                tata = tata.replace("\n", " ")
+                tata.replace("\t", " ")
+                tata = tata.strip()
+                if isinstance(elt, class_xml.paragraph)\
+                   or isinstance(elt, class_xml.note):
+                    data = ('Paragraphe '+elt.texte, tata)
+                elif isinstance(elt, class_xml.section):
+                    data = ('Section '+elt.Titre, tata)
+                elif isinstance(elt, class_xml.image):
+                    data = ('Image '+elt.texte, tata)
+                tsv_writer.writerow(listes_classement[i][j]+data)
+        f.close()
+
+
 def moteur():
     """ moteur du chatbot"""
     signal = True
@@ -295,6 +321,8 @@ def moteur():
                 class_C.sort(key=lambda item: item[1])
                 elt, doc = docID2text(class_C[0][0])
                 retour_f.append(doc)
+                # annexe4([classement_A1, classement_A2,
+                #          classement_B, list(class_C)], "annexe4.tsv")
                 if isinstance(elt, class_xml.paragraph) or isinstance(
                         elt, class_xml.note):
                     print(elt.texte)

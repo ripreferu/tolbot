@@ -4,6 +4,7 @@ from scipy import sparse
 # import class_texte
 import logging
 import numpy as np
+from sklearn.preprocessing import normalize
 
 
 def sac_de_mots(voc, liste_des_str, stopwords):
@@ -78,6 +79,7 @@ def BM_25F(matrice, liste_doc_traités):
                 + matrice_pond[i, j])
             para_b = np.log((nb_doc-nb_doc_terme[j]+0.5)/(nb_doc_terme[j]))
             W[i, j] = para_a*para_b
+    W = normalize(W)
     return W
 
 
