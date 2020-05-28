@@ -177,7 +177,7 @@ def docID2text(DocID):
         if Doc.id == Doc_id:
             Document = Doc
             logger.debug("on a retrouvé le document!\n \
-            il se trouve à {}".format(Document.chemin.as_posix))
+            il se trouve à {}".format(Document.chemin))
     # print(Document)
     # Etape 2 retourver la partie du document concerné
     tree = Document.treelib
