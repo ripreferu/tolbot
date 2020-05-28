@@ -38,7 +38,7 @@ class document():
         L'objet est complet dès sa création. les objet internes sont recréer
         dès l'intanciation'''
         self.id = random.random()
-        self.chemin = pl.Path(chemin)
+        self.chemin = str(pl.Path(chemin))
         self.tree = ET.parse(chemin)
         self.racine_doc = self.tree.getroot()
         self.dico = self.racine_doc.tag[:-3]
@@ -92,7 +92,7 @@ class document():
                 if len(children.Contenu) > 0:
                     for item in children.Contenu:
                         if isinstance(item, figure) or isinstance(item, image):
-                            item.url = self.chemin.parents[0].joinpath(
+                            item.url = pl.Path(self.chemin).parents[0].joinpath(
                                 item.url)
                             self.treelib.create_node(
                                 tag=str(item), identifier=item.id,
