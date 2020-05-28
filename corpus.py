@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pickle
 import class_xml
 import class_texte

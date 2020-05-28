@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pathlib as pl
 import treelib as tl
 import random
@@ -92,8 +93,8 @@ class document():
                 if len(children.Contenu) > 0:
                     for item in children.Contenu:
                         if isinstance(item, figure) or isinstance(item, image):
-                            item.url = pl.Path(self.chemin).parents[0].joinpath(
-                                item.url)
+                            item.url = str(pl.Path(self.chemin).
+                                           parents[0].joinpath(item.url))
                             self.treelib.create_node(
                                 tag=str(item), identifier=item.id,
                                 parent=section_add.id, data=item)
