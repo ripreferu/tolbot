@@ -1,0 +1,26 @@
+#+Title: Tolbot un chatbot pour le tolérancement
+
+Ce travail a fait l'objet d'un travail de recherche d'un "Bachelor Arbeit" 
+dans le cadre du double diplôme pour le tolérancement
+* Installation
+** Clonage du dépot git
+Télécharger git [[https://git-csm.com][site officiel du site de controle de version git]]
+/Git est un logiciel publié sous license libre GPL, initialement dévellopé par Linus Torvald/
+#+BEGIN_SRC shell
+git clone https//github.com/ripreferu/tolbot.git
+#+END_SRC
+
+** installation du projet
+
+creation d'un nouvel environnement conda
+
+aller à la racine du projet en ligne de commande dans le nouvel environement
+#+BEGIN_SRC shell
+conda install --file requierments.txt
+#+END_SRC
+
+Certain package s'installe pas correctement
+essayer alors avec pip
+#+BEGIN_SRC shell
+pip install -r requierements.txt
+#+END_SRC
