@@ -1,2 +1,0 @@
-# tolbot
-Bachelor Arbeit TolBot
