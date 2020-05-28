@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pickle
 from scipy.sparse import csr_matrix
 from scipy import sparse
