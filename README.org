@@ -1,26 +1,89 @@
 #+Title: Tolbot un chatbot pour le tolérancement
+[[file:cover.png][Voici Tolbot un prototype de chatbot pour le tolérancement]]
 
-Ce travail a fait l'objet d'un travail de recherche d'un "Bachelor Arbeit" 
-dans le cadre du double diplôme pour le tolérancement
+*Disclaimer* Ce fichier ~.org~ est beaucoup lisible via github ou via emacs. (ou VS-code via le plugin org-mode)
+
+
+*NB*: /Ce travail a fait l'objet d'un travail de recherche d'un "Bachelor Arbeit" dans le cadre du double diplôme ARTS ET METIERS ENSAM/
+
+
 * Installation
 ** Clonage du dépot git
-Télécharger git [[https://git-csm.com][site officiel du site de controle de version git]]
+Télécharger git [[https://git-csm.com][site officiel du site de controle de version git
+]]
 /Git est un logiciel publié sous license libre GPL, initialement dévellopé par Linus Torvald/
+
 #+BEGIN_SRC shell
 git clone https//github.com/ripreferu/tolbot.git
 #+END_SRC
 
 ** installation du projet
+Ce projet est déclaré fonctionnel <2020-05-29 ven.> pour la version ~3.6~ de Python sous les systèmes d'exploitations suivants:
+- Linux (Archlinux, Manjaro), et les autres distributions (Ubuntu, Debian)
+- Windows 10
 
-creation d'un nouvel environnement conda
 
-aller à la racine du projet en ligne de commande dans le nouvel environement
+creation d'un nouvel environnement conda:
+#+BEGIN_SRC shell
+conda create mon_nouv_env
+#+END_SRC
+
+allez à la racine du projet en ligne de commande dans le nouvel environement
 #+BEGIN_SRC shell
 conda install --file requierments.txt
 #+END_SRC
 
-Certain package s'installe pas correctement
-essayer alors avec pip
+Si certains packages ne s'installent pas correctement,
+essayez alors avec pip
 #+BEGIN_SRC shell
 pip install -r requierements.txt
 #+END_SRC
+* TODO Fonctionnement 
+Je mettrai le rapport de recherche associé à ce projet quand celui ci sera officialisé.
+Ce document détaille ma démarche et l'aspect technique.
+
+Je mettrai aussi très probablement la présentation (~powerpoint~ =!= ) commenté si j'ai le temps
+Les notebooks [[file:Tfidf.ipynb][tfidf]] [[file:LDA.ipynb][LDA.ipynb]] [[file:LSI.ipynb][LSI]] sont des notebooks qui font offices de /Proof-of-Concept/ .
+On réinvente pas la roue mais cela permet de poser les bases de la recherche d'informations.
+* Documentation
+** TL;DR
+
+*Pour faire marcher le chatbot il suffit d'éxécuter le fichier [[file:moteur_chat.py][moteur_chat.py]]*
+
+** ADDENTUM:
+Ce projet prend pour le base le projet de Sophie Oudot dont le fichier [[file:Chatbot_V9.py][Chatbot_V9]] est l'aboutissement.
+En l'état actuel ce programme est bugée partiellement bugée. Mais j'ai simplifié les dépendances fonctionnelles.
+Mais les idées de sa créatrice y sont rétranscrites .
+
+
+** La préparation du corpus
+L'étude part des cours au format pdf ou word. Ces fichiers sont convertis en Markdown:
+- via la framework [[https://github.com/axa-group/Parsr.git][Parsr développé par le groupe AXA]] pour les pdf
+- via [[https://www.pandoc.org][l'utilitaire pandoc]] pour les fichiers words.
+ 
+
+Le fichier Markdown est ensuite exporté au format XML/TEI toujours grace à pandoc.
+
+** Interprétation
+Les fichiers de cours transformé sont renseigné dans le fichier [[file:corpus.py][corpus.py]] qui les réinterprètent 
+selon les classes définies par [[file:class_xml.py][le fichier class_xml]].
+
+Par la suite on ne s'intéresse qu'au données textuelles.
+Les fichiers sont alors découpés en unités logiques (appélées /documents/ =oui cela commence à se complexifier :/=),
+ en suivant rigoureusement la hiérarchie du cours.
+Dans un soucis d'uniformisation ces données textuelles sont placées dans une même [[file:class_texte.py][classe *Texte*]]
+L'ensemble des données relatives ou corpus sont le vocabulaires [[file:vocabulary.p][(ici)]] et les fameux _documents_ [[file:docment_traites.p][(sic) docment_traites.p]].
+Ces fichiers sont interprétables en python via le module pickle.
+** création de différentes modèles
+On créé ensuite les modèles sac de mots et plongement de mots  via les fichiers [[file:Bag_of_words.py][Bag_of_Words.py]]
+et [[file:word2vec_tf.py][word2vec_tf_keras.py]] . 
+Les 2 modèles sont ensuite exportés sous la formes de 2 matrices respectivement aux formats ~.npz~
+ et ~.npy~.
+
+* Moteur du chatbot
+
+Le fichier [[file:moteur_chat.py][moteur_chat.py]] est le fichier  à éxécuter pour faire fonctionner le chatbot via la fonction moteur()
+
+#+BEGIN_COMMENT :noexport
+Certaines parties du codes sont difficiles à lire/non documentés (cad  *kof* *kof* mal conçues, désolé)
+#+END_COMMENT
