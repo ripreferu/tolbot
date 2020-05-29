@@ -1,25 +1,25 @@
 #+Title: Tolbot un chatbot pour le tolérancement
-#+CAPTION: Voici Tolbot un prototype de chatbot pour le tolérancement
+#+NAME: fig:Voici Tolbot un prototype de chatbot pour le tolérancement
 [[./cover.png]]
 
-*Disclaimer* Ce fichier ~.org~ est beaucoup lisible via github ou via emacs. (ou VS-code via le plugin org-mode)
+*Disclaimer* Ce fichier ~README.org~ est beaucoup plus lisible via github ou via [[https://www.emacs.org][emacs]]. (ou VS-code via le plugin org-mode)
 
 
-*NB*: /Ce travail a fait l'objet d'un travail de recherche d'un "Bachelor Arbeit" dans le cadre du double diplôme ARTS ET METIERS ENSAM/
-
+*NB*: /Ce travail a fait l'objet d'un travail de recherche (Bachelor Arbeit) dans le cadre du double diplôme ~ARTS ET METIERS (ENSAM)~ et le ~Karlsruher Institut für Technologie ou KIT~ ./
 
 * Installation
 ** Clonage du dépot git
-Télécharger git [[https://git-csm.com][site officiel du site de controle de version git
-]]
-/Git est un logiciel publié sous license libre GPL, initialement dévellopé par Linus Torvald/
+Télécharger git [[https://git-csm.com][site officiel du site de controle de version git]]
+
+
+/Git est un logiciel publié sous license libre GPL, initialement dévellopé par Linus Torvalds./
 
 #+BEGIN_SRC shell
 git clone https//github.com/ripreferu/tolbot.git
 #+END_SRC
 
 ** installation du projet
-Ce projet est déclaré fonctionnel <2020-05-29 ven.> pour la version ~3.6~ de Python sous les systèmes d'exploitations suivants:
+Ce projet est déclaré fonctionnel ce <2020-05-29 ven.> pour la version ~3.6~ de Python sous les systèmes d'exploitations suivants:
 - Linux (Archlinux, Manjaro), et les autres distributions (Ubuntu, Debian)
 - Windows 10
 
@@ -41,9 +41,11 @@ pip install -r requierements.txt
 #+END_SRC
 * TODO Fonctionnement 
 Je mettrai le rapport de recherche associé à ce projet quand celui ci sera officialisé.
-Ce document détaille ma démarche et l'aspect technique.
+Ce document détaillera ma démarche et son aspect scientifique.
 
-Je mettrai aussi très probablement la présentation (~powerpoint~ =!= ) commenté si j'ai le temps
+Je mettrai aussi très probablement la présentation (~powerpoint~ =!= ) commenté si j'ai le temps...
+
+
 Les notebooks [[file:Tfidf.ipynb][tfidf]] [[file:LDA.ipynb][LDA.ipynb]] [[file:LSI.ipynb][LSI]] sont des notebooks qui font offices de /Proof-of-Concept/ .
 On réinvente pas la roue mais cela permet de poser les bases de la recherche d'informations.
 * Documentation
@@ -81,10 +83,13 @@ et [[file:word2vec_tf.py][word2vec_tf_keras.py]] .
 Les 2 modèles sont ensuite exportés sous la formes de 2 matrices respectivement aux formats ~.npz~
  et ~.npy~.
 
-* Moteur du chatbot
+** Moteur du chatbot
 
-Le fichier [[file:moteur_chat.py][moteur_chat.py]] est le fichier  à éxécuter pour faire fonctionner le chatbot via la fonction moteur()
+ Le fichier [[file:moteur_chat.py][moteur_chat.py]] est le fichier  à éxécuter pour faire fonctionner le chatbot via la fonction moteur()
 
-#+BEGIN_COMMENT :noexport
-Certaines parties du codes sont difficiles à lire/non documentés (cad  *kof* *kof* mal conçues, désolé)
-#+END_COMMENT
+ #+BEGIN_COMMENT :noexport
+ Certaines parties du codes sont difficiles à lire/non documentés (cad  *kof* *kof* mal conçues, désolé)
+ #+END_COMMENT
+
+** Clustering
+La démarche inclut aussi du clustering
