@@ -1,5 +1,5 @@
 #+Title: Tolbot un chatbot pour le tolérancement
-[[file:cover.png][Voici Tolbot un prototype de chatbot pour le tolérancement]]
+[[./cover.png][Voici Tolbot un prototype de chatbot pour le tolérancement]]
 
 *Disclaimer* Ce fichier ~.org~ est beaucoup lisible via github ou via emacs. (ou VS-code via le plugin org-mode)
 
