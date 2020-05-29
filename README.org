@@ -1,15 +1,16 @@
-#+Title: Tolbot un chatbot pour le tolérancement
-#+NAME: fig:Voici Tolbot un prototype de chatbot pour le tolérancement
+#+Title: Tolbot un chatbot pour le tolérancemen
 [[./cover.png]]
+Voici Tolbot un prototype de chatbot pour le tolérancement assisté par Ordinateur.
+
 
 *Disclaimer* Ce fichier ~README.org~ est beaucoup plus lisible via github ou via [[https://www.emacs.org][emacs]]. (ou VS-code via le plugin org-mode)
 
 
-*NB*: /Ce travail a fait l'objet d'un travail de recherche (Bachelor Arbeit) dans le cadre du double diplôme ~ARTS ET METIERS (ENSAM)~ et le ~Karlsruher Institut für Technologie ou KIT~ ./
-
+*NB*: /Ce travail a fait l'objet d'un travail de recherche (Bachelor Arbeit) dans le cadre du double diplôme _ARTS ET METIERS (ENSAM)_ et/
+/le _Karlsruher Institut für Technologie ou KIT_ ./
 * Installation
 ** Clonage du dépot git
-Télécharger git [[https://git-csm.com][site officiel du site de controle de version git]]
+Télécharger git [[https://git-csm.com][site officiel du système de controle de version git]]
 
 
 /Git est un logiciel publié sous license libre GPL, initialement dévellopé par Linus Torvalds./
@@ -19,7 +20,7 @@ git clone https//github.com/ripreferu/tolbot.git
 #+END_SRC
 
 ** installation du projet
-Ce projet est déclaré fonctionnel ce <2020-05-29 ven.> pour la version ~3.6~ de Python sous les systèmes d'exploitations suivants:
+Ce projet est déclaré fonctionnel à la date <2020-05-29 ven.> pour la version ~3.6~ de Python sous les systèmes d'exploitations suivants:
 - Linux (Archlinux, Manjaro), et les autres distributions (Ubuntu, Debian)
 - Windows 10
 
