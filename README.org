@@ -1,4 +1,4 @@
-#+Title: Tolbot un chatbot pour le tolérancemen
+#+Title: Tolbot un chatbot pour le tolérancement
 [[./cover.png]]
 Voici Tolbot un prototype de chatbot pour le tolérancement assisté par Ordinateur.
 
@@ -6,8 +6,8 @@ Voici Tolbot un prototype de chatbot pour le tolérancement assisté par Ordinat
 *Disclaimer* Ce fichier ~README.org~ est beaucoup plus lisible via github ou via [[https://www.emacs.org][emacs]]. (ou VS-code via le plugin org-mode)
 
 
-*NB*: /Ce travail a fait l'objet d'un travail de recherche (Bachelor Arbeit) dans le cadre du double diplôme _ARTS ET METIERS (ENSAM)_ et/
-/le _Karlsruher Institut für Technologie ou KIT_ ./
+*NB*: /Ce travail a fait l'objet d'un travail de recherche (Bachelor Arbeit) dans le cadre du double diplôme ARTS ET METIERS (ENSAM)  et/
+/le Karlsruher Institut für Technologie (KIT) ./
 * Installation
 ** Clonage du dépot git
 Télécharger git [[https://git-csm.com][site officiel du système de controle de version git]]
@@ -22,7 +22,7 @@ git clone https//github.com/ripreferu/tolbot.git
 ** installation du projet
 Ce projet est déclaré fonctionnel à la date <2020-05-29 ven.> pour la version ~3.6~ de Python sous les systèmes d'exploitations suivants:
 - Linux (Archlinux, Manjaro), et les autres distributions (Ubuntu, Debian)
-- Windows 10
+- Windows 10 (seul le moteur a été testé)
 
 
 creation d'un nouvel environnement conda:
@@ -67,6 +67,7 @@ L'étude part des cours au format pdf ou word. Ces fichiers sont convertis en Ma
  
 
 Le fichier Markdown est ensuite exporté au format XML/TEI toujours grace à pandoc.
+[[./logi_traitement_donnée.png]]
 
 ** Interprétation
 Les fichiers de cours transformé sont renseigné dans le fichier [[file:corpus.py][corpus.py]] qui les réinterprètent 
@@ -79,6 +80,12 @@ Dans un soucis d'uniformisation ces données textuelles sont placées dans une m
 L'ensemble des données relatives ou corpus sont le vocabulaires [[file:vocabulary.p][(ici)]] et les fameux _documents_ [[file:docment_traites.p][(sic) docment_traites.p]].
 Ces fichiers sont interprétables en python via le module pickle.
 ** création de différentes modèles
+Les données textuelles sont ensuite lemmatisé.
+
+
+[[./logi_taln.png]]
+
+
 On créé ensuite les modèles sac de mots et plongement de mots  via les fichiers [[file:Bag_of_words.py][Bag_of_Words.py]]
 et [[file:word2vec_tf.py][word2vec_tf_keras.py]] . 
 Les 2 modèles sont ensuite exportés sous la formes de 2 matrices respectivement aux formats ~.npz~
@@ -87,10 +94,15 @@ Les 2 modèles sont ensuite exportés sous la formes de 2 matrices respectivemen
 ** Moteur du chatbot
 
  Le fichier [[file:moteur_chat.py][moteur_chat.py]] est le fichier  à éxécuter pour faire fonctionner le chatbot via la fonction moteur()
-
+[[./logi_moteur.png]]
  #+BEGIN_COMMENT :noexport
  Certaines parties du codes sont difficiles à lire/non documentés (cad  *kof* *kof* mal conçues, désolé)
  #+END_COMMENT
 
 ** Clustering
 La démarche inclut aussi du clustering
+Pour guider le choix de l'utilisateur
+[[file:clustering.py][Cf ce fichier]]
+#+BEGIN_COMMENT :noexport
+Le fichier est probablement à refactoriser et à intégrer ce truc au moteur
+#+END_COMMENT
